@@ -8,221 +8,184 @@
 #include<thread>
 using namespace std;
 using namespace chrono;
-class Node {
-   public:
-  string key;
-  Node *left;
-  Node *right;
-  int height;
+template<class T>
+class Node{
+    public:
+    Node *left, *right;
+    T data;
+    int height;
+    Node(T data){
+        this->data = data;
+        left = NULL;
+        right = NULL;
+        height = 0;
+    }
 };
-
-int maxx(int a, int b);
-
-// Calculate height
-int height(Node *N) {
-  if (N == NULL)
-    return 0;
-  return N->height;
-}
-
-int maxx(int a, int b) {
-  return (a > b) ? a : b;
-}
-
-// New node creation
-Node *newNode(string key) {
-  Node *node = new Node();
-  node->key = key;
-  node->left = NULL;
-  node->right = NULL;
-  node->height = 1;
-  return (node);
-}
-
-// Rotate right
-Node *rightRotate(Node *y) {
-  Node *x = y->left;
-  Node *T2 = x->right;
-  x->right = y;
-  y->left = T2;
-  y->height = maxx(height(y->left),
-          height(y->right)) +
-        1;
-  x->height = maxx(height(x->left),
-          height(x->right)) +
-        1;
-  return x;
-}
-
-// Rotate left
-Node *leftRotate(Node *x) {
-  Node *y = x->right;
-  Node *T2 = y->left;
-  y->left = x;
-  x->right = T2;
-  x->height = maxx(height(x->left),
-          height(x->right)) +
-        1;
-  y->height = maxx(height(y->left),
-          height(y->right)) +
-        1;
-  return y;
-}
-
-// Get the balance factor of each node
-int getBalanceFactor(Node *N) {
-  if (N == NULL)
-    return 0;
-  return height(N->left) -
-       height(N->right);
-}
-
-// Insert a node
-Node *insertNode(Node *node, string key) {
-  // Find the correct postion and insert the node
-  if (node == NULL)
-    return (newNode(key));
-  if (key < node->key)
-    node->left = insertNode(node->left, key);
-  else if (key > node->key)
-    node->right = insertNode(node->right, key);
-  else
-    return node;
-
-  // Update the balance factor of each node and
-  // balance the tree
-  node->height = 1 + maxx(height(node->left),
-               height(node->right));
-  int balanceFactor = getBalanceFactor(node);
-  if (balanceFactor > 1) {
-    if (key < node->left->key) {
-      return rightRotate(node);
-    } else if (key > node->left->key) {
-      node->left = leftRotate(node->left);
-      return rightRotate(node);
+template<class T>
+class AVL{
+    public:
+    Node<T> *root;
+    int calcheight(Node<T> *root) {
+        if (root == NULL)
+            return 0;
+        return root->height;
     }
-  }
-  if (balanceFactor < -1) {
-    if (key > node->right->key) {
-      return leftRotate(node);
-    } else if (key < node->right->key) {
-      node->right = rightRotate(node->right);
-      return leftRotate(node);
-    }
-  }
-  return node;
-}
-
-// Node with minimum value
-Node *nodeWithMimumValue(Node *node) {
-  Node *current = node;
-  while (current->left != NULL)
-    current = current->left;
-  return current;
-}
-
-// Delete a node
-Node *deleteNode(Node *root, string key) {
-  // Find the node and delete it
-  if (root == NULL)
-    return root;
-  if (key < root->key)
-    root->left = deleteNode(root->left, key);
-  else if (key > root->key)
-    root->right = deleteNode(root->right, key);
-  else {
-    if ((root->left == NULL) ||
-      (root->right == NULL)) {
-      Node *temp = root->left ? root->left : root->right;
-      if (temp == NULL) {
-        temp = root;
+    AVL(){
         root = NULL;
-      } else
-        *root = *temp;
-      free(temp);
-    } else {
-      Node *temp = nodeWithMimumValue(root->right);
-      root->key = temp->key;
-      root->right = deleteNode(root->right,
-                   temp->key);
     }
-  }
+    int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
+    int getBalance(Node<T> *root){
+        if(root==NULL)
+            return 0;
+        return calcheight(root->left)-calcheight(root->right);
+    }
+    Node<T>* insert(Node<T> *root,T data){
+        if(root==NULL){
+            root = new Node<T>(data);
+            
+            return root;
+        }
+        if(root->data<data){
+            root->right = insert(root->right, data);
+        }
+        else if(root->data>data){
+            root->left = insert(root->left, data);
+        }
+        else{
+            return root;
+        }
+        root->height = 1+max(calcheight(root->left), calcheight(root->right));
+        int bf = getBalance(root);
+        if(bf>1 &&getBalance(root->left)>=0){
+            return rightRotate(root);
+        }
+        if(bf>1 && getBalance(root->left)<0){
+            root->left = leftRotate(root->left);
+            return rightRotate(root);
+        }
+        if(bf<-1&&getBalance(root->right)<=0){
+            return leftRotate(root);
+        }
+        if(bf<-1&&getBalance(root->right)>0){
+            root->right = leftRotate(root->right);
+            return leftRotate(root);
+        }
+        return root;
+    }
+    // Rotate right
+    Node<T> *rightRotate(Node<T> *y) {
+        Node<T> *x = y->left;
+        Node<T> *T2 = x->right;
+        x->right = y;
+        y->left = T2;
+        y->height = max(calcheight(y->left),calcheight(y->right))+1;
+        x->height = max(calcheight(x->left),calcheight(x->right))+1;
+        return x;
+    }
 
-  if (root == NULL)
-    return root;
-
-  // Update the balance factor of each node and
-  // balance the tree
-  root->height = 1 + maxx(height(root->left),
-               height(root->right));
-  int balanceFactor = getBalanceFactor(root);
-  if (balanceFactor > 1) {
-    if (getBalanceFactor(root->left) >= 0) {
-      return rightRotate(root);
-    } else {
-      root->left = leftRotate(root->left);
-      return rightRotate(root);
+    // Rotate left
+    Node<T> *leftRotate(Node<T> *x) {
+        Node<T> *y = x->right;
+        Node<T> *T2 = y->left;
+        y->left = x;
+        x->right = T2;
+        x->height = max(calcheight(x->left),calcheight(x->right))+1;
+        y->height = max(calcheight(y->left),calcheight(y->right))+1;
+        return y;
     }
-  }
-  if (balanceFactor < -1) {
-    if (getBalanceFactor(root->right) <= 0) {
-      return leftRotate(root);
-    } else {
-      root->right = rightRotate(root->right);
-      return leftRotate(root);
+    void inorder(Node<T> *root){
+        if(root==NULL){
+            return;
+        }
+        inorder(root->left);
+        cout<<root->data<<" ";
+        inorder(root->right);
     }
-  }
-  return root;
-}
-bool AVLsearch(Node* root, string key)
-{
-    // If root is NULL
-    if (root == NULL)
-        return false;
-  
-    // If found, return true
-    else if (root->key == key){
-        cout<<root->key<<"LESSS GOOO"<<endl;
-        return true;
+    Node<T>* deleteNode(Node<T> *root, T key){
+        if(root==NULL){
+            return NULL;
+        }
+        if(root->data>key){
+            root->left = deleteNode(root->left, key);
+        }
+        else if(root->data<key){
+            root->right = deleteNode(root->right, key);
+        }
+        else {
+            if ((root->left == NULL) ||(root->right == NULL)) {
+            Node<T> *temp = root->left ? root->left : root->right;
+            if (temp == NULL) {
+                temp = root;
+                root = NULL;
+            } else
+                *root = *temp;
+                free(temp);
+            } else {
+                Node<T> *temp = nodeWithMimumValue(root->right);
+                root->data = temp->data;
+                root->right = deleteNode(root->right,temp->data);
+            }
+        }
+        if(root==NULL){
+            return NULL;
+        }
+        root->height = 1+max(calcheight(root->left), calcheight(root->right));
+        int bf = getBalance(root);
+        if(bf>1 &&getBalance(root->left)>=0){
+            return rightRotate(root);
+        }
+        if(bf>1 && getBalance(root->left)<0){
+            root->left = leftRotate(root->left);
+            return rightRotate(root);
+        }
+        if(bf<-1&&getBalance(root->right)<=0){
+            return leftRotate(root);
+        }
+        if(bf<-1&&getBalance(root->right)>0){
+            root->right = leftRotate(root->right);
+            return leftRotate(root);
+        }
+        return root;
     }
+    Node<T> *nodewithmaxValue(Node<T> *root){
+        if(root->right==NULL){
+            return root;
+        }
+        return nodewithmaxValue(root->right);
+    }
+    Node<T> *nodeWithMimumValue(Node<T> *node) {
+        Node<T> *current = node;
+        while (current->left != NULL)
+            current = current->left;
+        return current;
+    }
+    void BFS(Node<T> *root){
+        if(root==NULL){
+            return;
+        }
+        queue<Node<T>*>q;
+        q.push(root);
+        while (!q.empty())
+        {
+            Node<T> *temp = q.front();
+            cout<<temp->data<<" ";
+            q.pop();
+            if(temp->left!=NULL){
+                q.push(temp->left);
+            }
+            if(temp->right!=NULL){
+                q.push(temp->right);
+            }
+        }
         
-  
-    // Recur to the left subtree if
-    // the current node's value is
-    // greater than key
-    else if (root->key > key) {
-        bool val = AVLsearch(root->left, key);
-        return val;
     }
-  
-    // Otherwise, recur to the
-    // right subtree
-    else {
-        bool val = AVLsearch(root->right, key);
-
-                return val;
-    }
-}
-// Print the tree
-void printTree(Node *root, string indent, bool last) {
-  if (root != nullptr) {
-    cout << indent;
-    if (last) {
-      cout << "R----";
-      indent += "   ";
-    } else {
-      cout << "L----";
-      indent += "|  ";
-    }
-    cout << root->key << endl;
-    printTree(root->left, indent, false);
-    printTree(root->right, indent, true);
-  }
-}
+};
 ifstream readFile1("passwords_22.txt");
-Node* root1 = NULL;
-Node* root2 = NULL;
-Node* root3 = NULL;
+Node<string>* root1 = NULL;
+Node<string>* root2 = NULL;
+Node<string>* root3 = NULL;
 void startFromStart(){
     ifstream readFile2("passwords_22.txt");
     string line;
