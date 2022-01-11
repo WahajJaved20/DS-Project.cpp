@@ -22,8 +22,7 @@ int main()
     cout<<"Enter password: ";
     getline(cin, str);
     string hash = sha1func(str);
-    
-    cout << "The SHA-1 of \"" << str << "\" is: " << hash << endl;
+    cout << "The SHA-1 of " << str << " is: " << hash << endl;
 
     return 0;
 }
