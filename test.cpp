@@ -6,6 +6,7 @@
 #include<queue>
 #include<chrono>
 #include<thread>
+#include<vector>
 using namespace std;
 using namespace chrono;
 template<class T>
@@ -25,15 +26,17 @@ template<class T>
 class AVL{
     public:
     Node<T> *root;
+    AVL(){
+      root = NULL;
+    }
+
+   
     int calcheight(Node<T> *root) {
         if (root == NULL)
             return 0;
         return root->height;
     }
-    AVL(){
-        root = NULL;
-    }
-    int max(int a, int b) {
+    int maxx(int a, int b) {
         return (a > b) ? a : b;
     }
     int getBalance(Node<T> *root){
@@ -80,8 +83,8 @@ class AVL{
         Node<T> *T2 = x->right;
         x->right = y;
         y->left = T2;
-        y->height = max(calcheight(y->left),calcheight(y->right))+1;
-        x->height = max(calcheight(x->left),calcheight(x->right))+1;
+        y->height = maxx(calcheight(y->left),calcheight(y->right))+1;
+        x->height = maxx(calcheight(x->left),calcheight(x->right))+1;
         return x;
     }
 
@@ -91,8 +94,8 @@ class AVL{
         Node<T> *T2 = y->left;
         y->left = x;
         x->right = T2;
-        x->height = max(calcheight(x->left),calcheight(x->right))+1;
-        y->height = max(calcheight(y->left),calcheight(y->right))+1;
+        x->height = maxx(calcheight(x->left),calcheight(x->right))+1;
+        y->height = maxx(calcheight(y->left),calcheight(y->right))+1;
         return y;
     }
     void inorder(Node<T> *root){
@@ -131,7 +134,7 @@ class AVL{
         if(root==NULL){
             return NULL;
         }
-        root->height = 1+max(calcheight(root->left), calcheight(root->right));
+        root->height = 1+maxx(calcheight(root->left), calcheight(root->right));
         int bf = getBalance(root);
         if(bf>1 &&getBalance(root->left)>=0){
             return rightRotate(root);
@@ -161,78 +164,106 @@ class AVL{
             current = current->left;
         return current;
     }
-    void BFS(Node<T> *root){
-        if(root==NULL){
-            return;
-        }
-        queue<Node<T>*>q;
-        q.push(root);
-        while (!q.empty())
-        {
-            Node<T> *temp = q.front();
-            cout<<temp->data<<" ";
-            q.pop();
-            if(temp->left!=NULL){
-                q.push(temp->left);
-            }
-            if(temp->right!=NULL){
-                q.push(temp->right);
-            }
-        }
-        
+    void printTree(Node<T> *root, string indent, bool last) {
+      if (root != nullptr) {
+        cout << indent;
+    if (last) {
+      cout << "R----";
+      indent += "   ";
+    } else {
+      cout << "L----";
+      indent += "|  ";
     }
+    cout << root->data << endl;
+    printTree(root->left, indent, false);
+    printTree(root->right, indent, true);
+  }
+}
 };
-ifstream readFile1("passwords_22.txt");
-Node<string>* root1 = NULL;
-Node<string>* root2 = NULL;
-Node<string>* root3 = NULL;
-void startFromStart(){
-    ifstream readFile2("passwords_22.txt");
-    string line;
-    int lineNo = 0;
-    while(lineNo != 5000000-1){
-        getline(readFile1,line);
+AVL<string> AVL1,AVL2;
+vector<string> createFileNames(){
+  vector<string> fileNames;
+   for(int i=1;i<=26;i++){
+          string fileN = "passwords_";
+          fileN+=to_string(i);
+          fileN += ".txt";
+          fileNames.push_back(fileN);
+          fileN.clear();
+        }
+        return fileNames;
+}
+void startFromStart(string F_name){
+        ifstream readFile2(F_name);
+        string line;
+        int lineNo = 0;
+        while(lineNo != 5000000-1){
+            getline(readFile2,line);
+            string newLine = "";
+            for(int i=0;i<40;i++){
+                newLine += line[i];
+            }
+            AVL1.root = AVL1.insert(AVL1.root, line);
+            lineNo++;
+        }
+    }
+    void startFromHalf(string F_name){
+      ifstream readFile1(F_name);
+        string line;
+        int lineNo = 0;
+        while(lineNo != 5000000-1){
+            getline(readFile1,line);
+            lineNo++;
+        }
+        while(getline(readFile1,line)){
+            string newLine = "";
+            for(int i=0;i<40;i++){
+                newLine += line[i];
+            }
+            AVL2.root = AVL2.insert(AVL2.root,newLine);
+        }
+    }
+void createTree(string name){
+        thread th1(startFromStart,name);
+        thread th2(startFromHalf,name);
+        th1.join();
+        th2.join();
+}
+string searchFile(vector<string> fileNames, string data){
+      int i = 0;
+      for(i=0;i<fileNames.size();i++){
+        ifstream current(fileNames[i]);
+        string line;
+        getline(current,line);
         string newLine = "";
         for(int i=0;i<40;i++){
-            newLine += line[i];
+          newLine += line[i];
         }
-        root1 = insertNode(root1,newLine);
-        lineNo++;
-    }
-}
-void startFromHalf(){
-     string line;
-     int lineNo = 0;
-    while(lineNo != 5000000-1){
-        getline(readFile1,line);
-        lineNo++;
-    }
-    while(getline(readFile1,line)){
-        string newLine = "";
-        for(int i=0;i<40;i++){
-            newLine += line[i];
+        if(newLine > data){
+          i--;
+          break;
         }
-        root2 = insertNode(root2,newLine);
+        current.close();
+      }
+      return fileNames[i];
     }
-    
-}
-
 int main(){
+   vector<string> fileNamesList;
+   fileNamesList = createFileNames();
+
+  string searchThis = "58333D43B4465B133B9C39761D28F854A7B1DCF2";
+    // ifstream readFile1("passwords_22.txt");
+    // // ifstream readFile2("passwords_1.txt");
+    // // ifstream readFile3("passwords_3.txt");
    
-    string searchThis = "58333D43B4465B133B9C39761D28F854A7B1DCF2";
-    ifstream readFile1("passwords_22.txt");
-    // ifstream readFile2("passwords_1.txt");
-    // ifstream readFile3("passwords_3.txt");
-    auto start = steady_clock::now();
-        thread th1(startFromStart);
-        thread th2(startFromHalf);
+    //     thread th1(startFromStart);
+    //     thread th2(startFromHalf);
         
+   
+    // th1.join();
+    // th2.join();
+    auto start = steady_clock::now();
+    createTree(searchFile(fileNamesList,"58333D43B4465B133B9C39761D28F854A7B1DCF2"));
     auto end = steady_clock::now();
     float duration = duration_cast<microseconds>(end-start).count();
     cout<<endl<<duration/1000000;
-    th1.join();
-    th2.join();
-    // thread th2(startFromHalf,readFile2,root2);
-    // thread th3(startFromHalf,readFile3,root3);
-
 }
