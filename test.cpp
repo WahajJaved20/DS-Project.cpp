@@ -223,12 +223,41 @@ public:
             printTree(root->right, indent, true);
         }
     }
+    bool AVLsearch(Node<T>* root, string key)
+{
+    // If root is NULL
+    if (root == NULL)
+        return false;
+  
+    // If found, return true
+    else if (root->key == key){
+        cout<<root->key<<"LESSS GOOO"<<endl;
+        return true;
+    }
+        
+  
+    // Recur to the left subtree if
+    // the current node's value is
+    // greater than key
+    else if (root->key > key) {
+        bool val = AVLsearch(root->left, key);
+        return val;
+    }
+  
+    // Otherwise, recur to the
+    // right subtree
+    else {
+        bool val = AVLsearch(root->right, key);
+
+                return val;
+    }
+}
 };
 AVL<string> AVL1, AVL2;
 vector<string> createFileNames()
 {
     vector<string> fileNames;
-    for (int i = 1; i <= 26; i++)
+    for (int i = 1; i <= 49; i++)
     {
         string fileN = "passwords_";
         fileN += to_string(i);
@@ -337,9 +366,13 @@ int main()
 
     // th1.join();
     // th2.join();
+	cout<<searchFile(fileNamesList,hash)<<endl;
     auto start = steady_clock::now();
-    createTree(searchFile(fileNamesList, searchThis));
+    createTree(searchFile(fileNamesList, hash));
     auto end = steady_clock::now();
     float duration = duration_cast<microseconds>(end - start).count();
-    cout << endl<< duration / 1000000;
+    cout << endl<< duration / 1000000<<endl;
+    if(hash < AVL1.root->data){
+        
+    }
 }
