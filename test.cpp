@@ -340,11 +340,11 @@ void names()
     void createTree(string name){
         thread th1(startFromStart,name);
         thread th2(startFromHalf, name);
-        //thread th3(loading_screen_search);
+        thread th3(loading_screen_search);
         th1.join();
         th2.join();
-        //TreeCreated = true;
-        //th3.join();
+        TreeCreated = true;
+        th3.join();
     }
     string searchFile(vector<string> fileNames, string data){
         int i = 0;
@@ -403,7 +403,7 @@ void names()
    
 int main()
 {
-    //loading_screen_start();
+    loading_screen_start();
     vector<string> fileNamesList;
     fileNamesList = createFileNames();
     string searchThis;
@@ -425,6 +425,8 @@ int main()
             if(AVL1.root){
                 AVL1.deleteTree(AVL1.root);
                 AVL2.deleteTree(AVL2.root);
+                AVL1.root = NULL;
+                AVL2.root = NULL;
             }
             currentFile = searchFile(fileNamesList,hash);
             auto start = steady_clock::now();
