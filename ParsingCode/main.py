@@ -3,7 +3,7 @@ smallfile = None
 file_count = 0
 with open('pwned-passwords-sha1-ordered-by-hash-v7.txt') as bigfile:
     for lineno, line in enumerate(bigfile):
-        if file_count== 26:
+        if file_count== 49:
             break
         if lineno % lines_per_file == 0:
             file_count+=1
