@@ -360,11 +360,12 @@ void names()
             }
             if (newLine > data){
                 i--;
-                break;
+                current.close();
+                return fileNames[i];
             }
             current.close();
         }
-        return fileNames[i];
+        return "NULL";
     }
 
     const string sha1func(const string input){
@@ -419,7 +420,10 @@ int main()
         fflush(stdin);
         string hash = sha1func(searchThis);
         system("cls");
-        if(currentFile == searchFile(fileNamesList,hash)){
+        if(searchFile(fileNamesList,hash) == "NULL"){
+            cout<<"The password exists beyond the bounds of our dataset. "<<endl;
+        }else{
+            if(currentFile == searchFile(fileNamesList,hash)){
             cout<<"Data should exist in FILE_{";
 	        cout<<currentFile<<"}"<<endl;
             searchResults(hash);
@@ -442,6 +446,8 @@ int main()
             searchResults(hash);
         
         }
+        }
+        
         cout<<"Do you want to search another password?(Y/N) ";
         cin>>choice;
         if(choice == "Y" || choice == "y"){
