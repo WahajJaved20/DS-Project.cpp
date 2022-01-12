@@ -319,15 +319,40 @@ class AVL{
         return false;
     }
 
+    void loading_screen_start()
+    {
+        cout << "\n\n\t\t\t\t PWNED PASSWORD DATASET \n\n\t\t\t\t";
+        printf("%c", 219);
+        for (int a = 1; a < 50; a++)
+        {
+            Sleep(20);
+            printf("%c", 219);
+        }
+        Sleep(30);
+        system("cls");
+    }
+    void loading_screen_search(){
+        cout << "\n\n\t\t\t\t Searching dataset...\n\n\n\t\t\t\t";
+        printf("%c", 219);
+        for (int a = 1; a < 50; a++)
+        {
+            Sleep(360);
+            printf("%c", 219);
+        }
+        Sleep(30);
+        system("cls");
+    }
 int main()
 {
+    loading_screen_start();
     vector<string> fileNamesList;
     fileNamesList = createFileNames();
     string searchThis;
     cout << "Enter password: ";
     getline(cin, searchThis);
     string hash = sha1func(searchThis);
-    cout << "The SHA-1 of " << searchThis << " is: " << hash << endl;
+    system("cls");
+    loading_screen_search();
 	cout<<searchFile(fileNamesList,hash)<<endl;
     auto start = steady_clock::now();
     createTree(searchFile(fileNamesList, hash));
