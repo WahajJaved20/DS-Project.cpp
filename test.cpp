@@ -224,34 +224,34 @@ public:
         }
     }
     bool AVLsearch(Node<T>* root, string key)
-{
-    // If root is NULL
-    if (root == NULL)
-        return false;
-  
-    // If found, return true
-    else if (root->data == key){
-        cout<<root->data<<"LESSS GOOO"<<endl;
-        return true;
-    }
-        
-  
-    // Recur to the left subtree if
-    // the current node's value is
-    // greater than key
-    else if (root->data > key) {
-        bool val = AVLsearch(root->left, key);
-        return val;
-    }
-  
-    // Otherwise, recur to the
-    // right subtree
-    else {
-        bool val = AVLsearch(root->right, key);
+    {
+        // If root is NULL
+        if (root == NULL)
+            return false;
+    
+        // If found, return true
+        else if (root->data == key){
+            cout<<root->data<<"LESSS GOOO"<<endl;
+            return true;
+        }
+            
+    
+        // Recur to the left subtree if
+        // the current node's value is
+        // greater than key
+        else if (root->data > key) {
+            bool val = AVLsearch(root->left, key);
+            return val;
+        }
+    
+        // Otherwise, recur to the
+        // right subtree
+        else {
+            bool val = AVLsearch(root->right, key);
 
-                return val;
+                    return val;
+        }
     }
-}
 };
 AVL<string> AVL1, AVL2;
 vector<string> createFileNames()
@@ -294,6 +294,7 @@ void startFromHalf(string F_name)
         getline(readFile1, line);
         lineNo++;
     }
+    //1-5000000
     while (getline(readFile1, line))
     {
         string newLine = "";
@@ -359,6 +360,7 @@ bool searching(string hash){
         bool result = AVL1.AVLsearch(AVL1.root, hash);
         return result;
     }
+    return false;
 }
 int main()
 {
