@@ -223,6 +223,16 @@ public:
             printTree(root->right, indent, true);
         }
     }
+    bool search(Node<T>* root, T key)
+    {
+        if (root == NULL || root->key == key)
+            return true;
+    
+        if (root->key < key)
+            return search(root->right, key);
+
+        return search(root->left, key);
+    }
 };
 AVL<string> AVL1, AVL2;
 vector<string> createFileNames()
@@ -318,6 +328,16 @@ const string sha1func(const string input)
     }
     return hash;
 }
+void searching(string hash){
+    Node<string> *max1;
+    max1 = AVL1.nodewithmaxValue(AVL1.root);
+    if(hash>max1->data){
+        AVL2.search(AVL2.root,hash);
+    }
+    else{
+        AVL1.search(AVL1.root, hash);
+    }
+}
 int main()
 {
     vector<string> fileNamesList;
@@ -338,7 +358,7 @@ int main()
     // th1.join();
     // th2.join();
     auto start = steady_clock::now();
-    createTree(searchFile(fileNamesList, searchThis));
+    createTree(searchFile(fileNamesList, hash));
     auto end = steady_clock::now();
     float duration = duration_cast<microseconds>(end - start).count();
     cout << endl<< duration / 1000000;
