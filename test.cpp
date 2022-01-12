@@ -223,22 +223,41 @@ public:
             printTree(root->right, indent, true);
         }
     }
-    bool search(Node<T>* root, T key)
-    {
-        if (root == NULL || root->key == key)
-            return true;
-    
-        if (root->key < key)
-            return search(root->right, key);
-
-        return search(root->left, key);
+    bool AVLsearch(Node<T>* root, string key)
+{
+    // If root is NULL
+    if (root == NULL)
+        return false;
+  
+    // If found, return true
+    else if (root->key == key){
+        cout<<root->key<<"LESSS GOOO"<<endl;
+        return true;
     }
+        
+  
+    // Recur to the left subtree if
+    // the current node's value is
+    // greater than key
+    else if (root->key > key) {
+        bool val = AVLsearch(root->left, key);
+        return val;
+    }
+  
+    // Otherwise, recur to the
+    // right subtree
+    else {
+        bool val = AVLsearch(root->right, key);
+
+                return val;
+    }
+}
 };
 AVL<string> AVL1, AVL2;
 vector<string> createFileNames()
 {
     vector<string> fileNames;
-    for (int i = 1; i <= 26; i++)
+    for (int i = 1; i <= 49; i++)
     {
         string fileN = "passwords_";
         fileN += to_string(i);
@@ -332,10 +351,10 @@ void searching(string hash){
     Node<string> *max1;
     max1 = AVL1.nodewithmaxValue(AVL1.root);
     if(hash>max1->data){
-        AVL2.search(AVL2.root,hash);
+        AVL2.AVLsearch(AVL2.root,hash);
     }
     else{
-        AVL1.search(AVL1.root, hash);
+        AVL1.AVLsearch(AVL1.root, hash);
     }
 }
 int main()
@@ -357,9 +376,13 @@ int main()
 
     // th1.join();
     // th2.join();
+	cout<<searchFile(fileNamesList,hash)<<endl;
     auto start = steady_clock::now();
     createTree(searchFile(fileNamesList, hash));
     auto end = steady_clock::now();
     float duration = duration_cast<microseconds>(end - start).count();
-    cout << endl<< duration / 1000000;
+    cout << endl<< duration / 1000000<<endl;
+    if(hash < AVL1.root->data){
+        
+    }
 }
