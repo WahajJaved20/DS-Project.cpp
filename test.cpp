@@ -265,6 +265,7 @@ void names()
         system("cls");
     }
     void loading_screen_search(){
+        system("cls");
         cout << "\n\n\t\t\t\t Searching dataset...\n\n\n\t\t\t\t";
         printf("%c", 219);
         int counter = 0;
@@ -408,7 +409,7 @@ int main()
     fileNamesList = createFileNames();
     string searchThis;
     string choice;
-    string currentFile = "";
+    string currentFile="";
     while(true){
         fflush(stdin);
         searchThis.clear();
@@ -443,6 +444,8 @@ int main()
         cout<<"Do you want to search another password?(Y/N) ";
         cin>>choice;
         if(choice == "Y" || choice == "y"){
+                system("cls");
+                system("cls");
                 continue;
         }else{
             system("cls");
