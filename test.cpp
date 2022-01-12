@@ -347,15 +347,14 @@ const string sha1func(const string input)
     }
     return hash;
 }
-void searching(string hash){
+bool searching(string hash){
     Node<string> *max1;
     max1 = AVL1.nodewithmaxValue(AVL1.root);
     if(hash>max1->data){
-        AVL2.AVLsearch(AVL2.root,hash);
+        return AVL2.AVLsearch(AVL2.root,hash);
     }
-    else{
-        AVL1.AVLsearch(AVL1.root, hash);
-    }
+    
+    return AVL1.AVLsearch(AVL1.root, hash);
 }
 int main()
 {
@@ -382,7 +381,5 @@ int main()
     auto end = steady_clock::now();
     float duration = duration_cast<microseconds>(end - start).count();
     cout << endl<< duration / 1000000<<endl;
-    if(hash < AVL1.root->data){
-        
-    }
+    cout<<searching(hash);
 }
