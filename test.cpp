@@ -222,6 +222,7 @@ class AVL{
             deleteTree(node->right);
             delete node;
             node = NULL;
+            TreeCreated = false;
         }
 };
 void names()
