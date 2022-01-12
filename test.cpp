@@ -318,10 +318,37 @@ class AVL{
         }
         return false;
     }
-
+     void names()
+{
+    system("cls");
+    cout << "\n--------------------------------------------------------------------------------------------------------------\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                          Welcome to PWNED PASSWORD DATASET                                 -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                      Developed by:                                         -\n";
+    cout << "-                                              Muhammad Hatif Mujahid 20K-0218                               -\n";
+    cout << "-                                                 Minhal Irfan 20K-0316                                      -\n";
+    cout << "-                                                   Wahaj Javed Alam 20K-0208                                -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "-                                                                                                            -\n";
+    cout << "--------------------------------------------------------------------------------------------------------------\n";
+    system("PAUSE");
+    }
     void loading_screen_start()
     {
-        cout << "\n\n\t\t\t\t PWNED PASSWORD DATASET \n\n\t\t\t\t";
+        names();
         printf("%c", 219);
         for (int a = 1; a < 50; a++)
         {
@@ -342,6 +369,7 @@ class AVL{
         Sleep(30);
         system("cls");
     }
+   
 int main()
 {
     loading_screen_start();
