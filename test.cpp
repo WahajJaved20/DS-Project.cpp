@@ -11,357 +11,314 @@
 #include "sha1.hpp"
 using namespace std;
 using namespace chrono;
+
+
 template <class T>
-class Node
-{
+class Node{
 public:
     Node *left, *right;
     T data;
+    string frequency;
     int height;
-    Node(T data)
-    {
+    Node(T data,string frequency){
+        this->frequency = frequency;
         this->data = data;
         left = NULL;
         right = NULL;
         height = 0;
     }
+    Node(){
+        left = right = NULL;
+    }
 };
 template <class T>
-class AVL
-{
-public:
-    Node<T> *root;
-    AVL()
-    {
-        root = NULL;
-    }
+class AVL{
+    public:
+        Node<T> *root;
+        AVL(){
+            root = NULL;
+        }
 
-    int calcheight(Node<T> *root)
-    {
-        if (root == NULL)
-            return 0;
-        return root->height;
-    }
-    int maxx(int a, int b)
-    {
-        return (a > b) ? a : b;
-    }
-    int getBalance(Node<T> *root)
-    {
-        if (root == NULL)
-            return 0;
-        return calcheight(root->left) - calcheight(root->right);
-    }
-    Node<T> *insert(Node<T> *root, T data)
-    {
-        if (root == NULL)
-        {
-            root = new Node<T>(data);
-
+        int calcheight(Node<T> *root){
+            if (root == NULL)
+                return 0;
+            return root->height;
+        }
+        int maxx(int a, int b){
+            return (a > b) ? a : b;
+        }
+        int getBalance(Node<T> *root){
+            if (root == NULL)
+                return 0;
+            return calcheight(root->left) - calcheight(root->right);
+        }
+        Node<T> *insert(Node<T> *root, T data,string frequency){
+            if (root == NULL){
+                root = new Node<T>(data,frequency);
+                return root;
+            }
+            if (root->data < data){
+                root->right = insert(root->right, data,frequency);
+            }else if (root->data > data){
+                root->left = insert(root->left, data,frequency);
+            }else{
+                return root;
+            }
+            root->height = 1 + max(calcheight(root->left), calcheight(root->right));
+            int bf = getBalance(root);
+            if (bf > 1 && getBalance(root->left) >= 0){
+                return rightRotate(root);
+            }
+            if (bf > 1 && getBalance(root->left) < 0){
+                root->left = leftRotate(root->left);
+                return rightRotate(root);
+            }
+            if (bf < -1 && getBalance(root->right) <= 0){
+                return leftRotate(root);
+            }
+            if (bf < -1 && getBalance(root->right) > 0){
+                root->right = leftRotate(root->right);
+                return leftRotate(root);
+            }
             return root;
         }
-        if (root->data < data)
-        {
-            root->right = insert(root->right, data);
+        // Rotate right
+        Node<T> *rightRotate(Node<T> *y){
+            Node<T> *x = y->left;
+            Node<T> *T2 = x->right;
+            x->right = y;
+            y->left = T2;
+            y->height = maxx(calcheight(y->left), calcheight(y->right)) + 1;
+            x->height = maxx(calcheight(x->left), calcheight(x->right)) + 1;
+            return x;
         }
-        else if (root->data > data)
-        {
-            root->left = insert(root->left, data);
-        }
-        else
-        {
-            return root;
-        }
-        root->height = 1 + max(calcheight(root->left), calcheight(root->right));
-        int bf = getBalance(root);
-        if (bf > 1 && getBalance(root->left) >= 0)
-        {
-            return rightRotate(root);
-        }
-        if (bf > 1 && getBalance(root->left) < 0)
-        {
-            root->left = leftRotate(root->left);
-            return rightRotate(root);
-        }
-        if (bf < -1 && getBalance(root->right) <= 0)
-        {
-            return leftRotate(root);
-        }
-        if (bf < -1 && getBalance(root->right) > 0)
-        {
-            root->right = leftRotate(root->right);
-            return leftRotate(root);
-        }
-        return root;
-    }
-    // Rotate right
-    Node<T> *rightRotate(Node<T> *y)
-    {
-        Node<T> *x = y->left;
-        Node<T> *T2 = x->right;
-        x->right = y;
-        y->left = T2;
-        y->height = maxx(calcheight(y->left), calcheight(y->right)) + 1;
-        x->height = maxx(calcheight(x->left), calcheight(x->right)) + 1;
-        return x;
-    }
 
-    // Rotate left
-    Node<T> *leftRotate(Node<T> *x)
-    {
-        Node<T> *y = x->right;
-        Node<T> *T2 = y->left;
-        y->left = x;
-        x->right = T2;
-        x->height = maxx(calcheight(x->left), calcheight(x->right)) + 1;
-        y->height = maxx(calcheight(y->left), calcheight(y->right)) + 1;
-        return y;
-    }
-    void inorder(Node<T> *root)
-    {
-        if (root == NULL)
-        {
-            return;
+        // Rotate left
+        Node<T> *leftRotate(Node<T> *x){
+            Node<T> *y = x->right;
+            Node<T> *T2 = y->left;
+            y->left = x;
+            x->right = T2;
+            x->height = maxx(calcheight(x->left), calcheight(x->right)) + 1;
+            y->height = maxx(calcheight(y->left), calcheight(y->right)) + 1;
+            return y;
         }
-        inorder(root->left);
-        cout << root->data << " ";
-        inorder(root->right);
-    }
-    Node<T> *deleteNode(Node<T> *root, T key)
-    {
-        if (root == NULL)
-        {
-            return NULL;
+
+        void inorder(Node<T> *root){
+            if (root == NULL){
+                return;
+            }
+            inorder(root->left);
+            cout << root->data << " ";
+            inorder(root->right);
         }
-        if (root->data > key)
-        {
-            root->left = deleteNode(root->left, key);
-        }
-        else if (root->data < key)
-        {
-            root->right = deleteNode(root->right, key);
-        }
-        else
-        {
-            if ((root->left == NULL) || (root->right == NULL))
-            {
-                Node<T> *temp = root->left ? root->left : root->right;
-                if (temp == NULL)
-                {
-                    temp = root;
-                    root = NULL;
-                }
-                else
-                    *root = *temp;
+
+        Node<T> *deleteNode(Node<T> *root, T key){
+            if (root == NULL){
+                return NULL;
+            }
+            if (root->data > key){
+                root->left = deleteNode(root->left, key);
+            }else if (root->data < key){
+                root->right = deleteNode(root->right, key);
+            }else{
+                if ((root->left == NULL) || (root->right == NULL)){
+                    Node<T> *temp = root->left ? root->left : root->right;
+                    if (temp == NULL){
+                        temp = root;
+                        root = NULL;
+                    }else{
+                        *root = *temp;
+                    }
                 free(temp);
+                }else{
+                    Node<T> *temp = nodeWithMimumValue(root->right);
+                    root->data = temp->data;
+                    root->right = deleteNode(root->right, temp->data);
+                }
             }
-            else
-            {
-                Node<T> *temp = nodeWithMimumValue(root->right);
-                root->data = temp->data;
-                root->right = deleteNode(root->right, temp->data);
+            if (root == NULL){
+                return NULL;
             }
-        }
-        if (root == NULL)
-        {
-            return NULL;
-        }
-        root->height = 1 + maxx(calcheight(root->left), calcheight(root->right));
-        int bf = getBalance(root);
-        if (bf > 1 && getBalance(root->left) >= 0)
-        {
-            return rightRotate(root);
-        }
-        if (bf > 1 && getBalance(root->left) < 0)
-        {
-            root->left = leftRotate(root->left);
-            return rightRotate(root);
-        }
-        if (bf < -1 && getBalance(root->right) <= 0)
-        {
-            return leftRotate(root);
-        }
-        if (bf < -1 && getBalance(root->right) > 0)
-        {
-            root->right = leftRotate(root->right);
-            return leftRotate(root);
-        }
-        return root;
-    }
-    Node<T> *nodewithmaxValue(Node<T> *root)
-    {
-        if (root->right == NULL)
-        {
+            root->height = 1 + maxx(calcheight(root->left), calcheight(root->right));
+            int bf = getBalance(root);
+            if (bf > 1 && getBalance(root->left) >= 0){
+                return rightRotate(root);
+            }
+            if (bf > 1 && getBalance(root->left) < 0){
+                root->left = leftRotate(root->left);
+                return rightRotate(root);
+            }
+            if (bf < -1 && getBalance(root->right) <= 0){
+                return leftRotate(root);
+            }
+            if (bf < -1 && getBalance(root->right) > 0){
+                root->right = leftRotate(root->right);
+                return leftRotate(root);
+            }
             return root;
         }
-        return nodewithmaxValue(root->right);
-    }
-    Node<T> *nodeWithMimumValue(Node<T> *node)
-    {
-        Node<T> *current = node;
-        while (current->left != NULL)
-            current = current->left;
-        return current;
-    }
-    void printTree(Node<T> *root, string indent, bool last)
-    {
-        if (root != nullptr)
-        {
-            cout << indent;
-            if (last)
-            {
-                cout << "R----";
-                indent += "   ";
+
+        Node<T> *nodewithmaxValue(Node<T> *root){
+            if (root->right == NULL){
+                return root;
             }
-            else
-            {
-                cout << "L----";
-                indent += "|  ";
-            }
+            return nodewithmaxValue(root->right);
+        }
+
+        Node<T> *nodeWithMimumValue(Node<T> *node){
+            Node<T> *current = node;
+            while (current->left != NULL)
+                current = current->left;
+            return current;
+        }
+
+        void printTree(Node<T> *root, string indent, bool last){
+            if (root != nullptr){
+                cout << indent;
+                if (last){
+                    cout << "R----";
+                    indent += "   ";
+                }else{
+                    cout << "L----";
+                    indent += "|  ";
+                }
             cout << root->data << endl;
             printTree(root->left, indent, false);
             printTree(root->right, indent, true);
+            }
         }
-    }
-    bool AVLsearch(Node<T>* root, string key)
-    {
-        // If root is NULL
-        if (root == NULL)
-            return false;
-    
-        // If found, return true
-        else if (root->data == key){
-            cout<<root->data<<"LESSS GOOO"<<endl;
-            return true;
-        }
-            
-    
-        // Recur to the left subtree if
-        // the current node's value is
-        // greater than key
-        else if (root->data > key) {
-            bool val = AVLsearch(root->left, key);
-            return val;
-        }
-    
-        // Otherwise, recur to the
-        // right subtree
-        else {
-            bool val = AVLsearch(root->right, key);
 
-                    return val;
+        bool AVLsearch(Node<T>* root, string key){
+            // If root is NULL
+            if (root == NULL)
+                return false;
+            // If found, return true
+            else if (root->data == key){
+                cout<<"The SHA-1 of your password is: "<<root->data<<endl;
+                cout<<"Your password has appeared "<<root->frequency<<" times in data breaches." <<endl;
+                cout<<"This implies that your password is insecure. "<<endl;
+                return true;
+            }
+            // Recur to the left subtree if
+            // the current node's value is
+            // greater than key
+            else if (root->data > key) {
+                bool val = AVLsearch(root->left, key);
+                return val;
+            }
+            // Otherwise, recur to the
+            // right subtree
+            else {
+                bool val = AVLsearch(root->right, key);
+                return val;
+            }
         }
-    }
 };
-AVL<string> AVL1, AVL2;
-vector<string> createFileNames()
-{
-    vector<string> fileNames;
-    for (int i = 1; i <= 49; i++)
-    {
-        string fileN = "passwords_";
-        fileN += to_string(i);
-        fileN += ".txt";
-        fileNames.push_back(fileN);
-        fileN.clear();
-    }
-    return fileNames;
-}
-void startFromStart(string F_name)
-{
-    ifstream readFile2(F_name);
-    string line;
-    int lineNo = 0;
-    while (lineNo != 5000000 - 1)
-    {
-        getline(readFile2, line);
-        string newLine = "";
-        for (int i = 0; i < 40; i++)
-        {
-            newLine += line[i];
+
+    AVL<string> AVL1, AVL2;
+
+    vector<string> createFileNames(){
+        vector<string> fileNames;
+        for (int i = 1; i <= 49; i++){
+            string fileN = "passwords_";
+            fileN += to_string(i);
+            fileN += ".txt";
+            fileNames.push_back(fileN);
+            fileN.clear();
         }
-        AVL1.root = AVL1.insert(AVL1.root, line);
-        lineNo++;
+        return fileNames;
     }
-}
-void startFromHalf(string F_name)
-{
-    ifstream readFile1(F_name);
-    string line;
-    int lineNo = 0;
-    while (lineNo != 5000000 - 1)
-    {
-        getline(readFile1, line);
-        lineNo++;
-    }
-    //1-5000000
-    while (getline(readFile1, line))
-    {
-        string newLine = "";
-        for (int i = 0; i < 40; i++)
-        {
-            newLine += line[i];
-        }
-        AVL2.root = AVL2.insert(AVL2.root, newLine);
-    }
-}
-void createTree(string name)
-{
-    thread th1(startFromStart, name);
-    thread th2(startFromHalf, name);
-    th1.join();
-    th2.join();
-}
-string searchFile(vector<string> fileNames, string data)
-{
-    int i = 0;
-    for (i = 0; i < fileNames.size(); i++)
-    {
-        ifstream current(fileNames[i]);
+
+    void startFromStart(string F_name){
+        ifstream readFile2(F_name);
         string line;
-        getline(current, line);
-        string newLine = "";
-        for (int i = 0; i < 40; i++)
-        {
-            newLine += line[i];
-        }
-        if (newLine > data)
-        {
-            i--;
-            break;
-        }
-        current.close();
-    }
-    return fileNames[i];
-}
-const string sha1func(const string input)
-{
-    SHA1 checksum;
-    checksum.update(input);
-    string hash = checksum.final();
-    for (int i = 0; i < hash.size(); i++)
-    {
-        if (isalpha(hash[i]))
-        {
-            hash[i] -= 32;
+        int lineNo = 0;
+        while (lineNo != 5000000 - 1){
+            getline(readFile2, line);
+            string newLine = "";
+            string frequency = "";
+            for (int i = 0; i < 40; i++){
+                newLine += line[i];
+            }
+            for(int i=41;i<line.size();i++){
+                frequency += line[i];
+            }
+            AVL1.root = AVL1.insert(AVL1.root, line,frequency);
+            lineNo++;
         }
     }
-    return hash;
-}
-bool searching(string hash){
-    Node<string> *max1;
-    max1 = AVL1.nodewithmaxValue(AVL1.root);
-    if(hash>max1->data){
-        bool result = AVL2.AVLsearch(AVL2.root,hash);
-        return result;
+
+    void startFromHalf(string F_name){
+        ifstream readFile1(F_name);
+        string line;
+        int lineNo = 0;
+        while (lineNo != 5000000 - 1){
+            getline(readFile1, line);
+            lineNo++;
+        }
+        while (getline(readFile1, line)){
+            string newLine = "";
+            string frequency = "";
+            for (int i = 0; i < 40; i++){
+                newLine += line[i];
+            }
+            for(int i=41;i<line.size();i++){
+                frequency += line[i];
+            }
+            AVL2.root = AVL2.insert(AVL2.root, newLine,frequency);
+        }
     }
-    else{
-        
-        bool result = AVL1.AVLsearch(AVL1.root, hash);
-        return result;
+    void createTree(string name){
+        thread th1(startFromStart,name);
+        thread th2(startFromHalf, name);
+        th1.join();
+        th2.join();
     }
-    return false;
-}
+    string searchFile(vector<string> fileNames, string data){
+        int i = 0;
+        for (i = 0; i < fileNames.size(); i++){
+            ifstream current(fileNames[i]);
+            string line;
+            getline(current, line);
+            string newLine = "";
+            for (int i = 0; i < 40; i++){
+                newLine += line[i];
+            }
+            if (newLine > data){
+                i--;
+                break;
+            }
+            current.close();
+        }
+        return fileNames[i];
+    }
+
+    const string sha1func(const string input){
+        SHA1 checksum;
+        checksum.update(input);
+        string hash = checksum.final();
+        for (int i = 0; i < hash.size(); i++){
+            if (isalpha(hash[i])){
+                hash[i] -= 32;
+            }
+        }
+        return hash;
+    }
+
+    bool searching(string hash){
+        Node<string> *max1;
+        max1 = AVL1.nodewithmaxValue(AVL1.root);
+        if(hash>max1->data){
+            bool result = AVL2.AVLsearch(AVL2.root,hash);
+            return result;
+        }else{    
+            bool result = AVL1.AVLsearch(AVL1.root, hash);
+            return result;
+        }
+        return false;
+    }
+
 int main()
 {
     vector<string> fileNamesList;
@@ -371,16 +328,6 @@ int main()
     getline(cin, searchThis);
     string hash = sha1func(searchThis);
     cout << "The SHA-1 of " << searchThis << " is: " << hash << endl;
-
-    // ifstream readFile1("passwords_22.txt");
-    // // ifstream readFile2("passwords_1.txt");
-    // // ifstream readFile3("passwords_3.txt");
-
-    //     thread th1(startFromStart);
-    //     thread th2(startFromHalf);
-
-    // th1.join();
-    // th2.join();
 	cout<<searchFile(fileNamesList,hash)<<endl;
     auto start = steady_clock::now();
     createTree(searchFile(fileNamesList, hash));
@@ -388,8 +335,8 @@ int main()
     float duration = duration_cast<microseconds>(end - start).count();
     cout << endl<< duration / 1000000<<endl;
     start = steady_clock::now();
-    cout<<endl<<searching(hash)<<endl;
+    cout<<endl<<"Search Results: "<<searching(hash)<<endl;
     end = steady_clock::now();
-    duration = duration_cast<microseconds>(end - start).count();
-    cout << endl<< duration / 1000000<<endl;
+    float duration1 = duration_cast<microseconds>(end - start).count();
+    cout << endl<< "Search Duration: "<<duration1/1000000<<endl;
 }
