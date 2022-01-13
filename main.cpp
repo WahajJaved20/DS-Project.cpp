@@ -444,10 +444,8 @@ int main()
             cout<<"Time Taken to load the file into memory: ";
             cout << duration / 1000000<<" seconds. "<<endl;
             searchResults(hash);
-        
+            }
         }
-        }
-        
         cout<<"Do you want to search another password?(Y/N) ";
         cin>>choice;
         if(choice == "Y" || choice == "y"){
