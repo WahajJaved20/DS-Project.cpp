@@ -6,11 +6,6 @@
 
 CS2001- Data Structures
 Semester Project
-
-Group Members:
-Muhammad Hatif Mujahid(20K-0218)
-Wahaj Javed Alam (20K-0208)
-Minhal Irfan (20K-0316)
 Section : BCS-3E
 
 Submitted to: Dr. Ali raza
